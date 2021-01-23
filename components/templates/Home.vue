@@ -5,7 +5,7 @@
         </v-row>
         <v-row class="text-center">
             <v-col cols="12">
-                みんなの好きな作品{{ user.name }}<v-btn @click="submit"></v-btn>
+                みんなの好きな作品
             </v-col>
         </v-row>
         <!-- <v-row>
@@ -15,7 +15,10 @@
         </v-row> -->
         <v-row v-if="ready">
             <v-col v-for="movie in movies" :key="movie.id">
-                 <v-card class="d-flex">
+                 <v-card 
+              
+                 class="d-flex"
+                 >
                     <div>
                       <v-img v-bind:src="'http://image.tmdb.org/t/p/w154/' + movie.poster_path"></v-img>
                     </div>
@@ -33,9 +36,8 @@
 </template>
 
 <script>
-import firebase from '@/plugins/firebase.js'
 import axios from 'axios'
-import CardTemplate from '../components/templates/CardTemplate'
+import CardTemplate from './CardTemplate.vue'
 export default {
     name: 'Home',
     components: {
@@ -47,7 +49,6 @@ export default {
             // movie: [],
             apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
             ready: false,
-            user: 'aaa',
         }
     },
     methods: {
@@ -65,36 +66,11 @@ export default {
          getItem(movie) {
              this.movie = movie;
         console.log('押した' + movie.title);
-    },
-    submit () {
-      const db = firebase.firestore()
-      let dbUsers = db.collection('users')
-      dbUsers
-        .add({
-          name: this.user.name,
-          email: this.user.email,
-        })
-        .then(ref => {
-          console.log('Add ID: ', ref.id)
-        })
-    },
+    }
     },
     mounted() {
         this.getMovies();
     },
-   created () {
-     const db = firebase.firestore()
-     let docUsers = db.collection('users').doc('Y8573rvjUGfGoq9bF9He')
-     docUsers
-         .get()
-         .then(doc => {
-           if(doc.exists){
-            this.user = doc.data();
-           } else {
-             console.log('fail')
-           }
-         })
-   },
 }
 </script>
 

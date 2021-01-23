@@ -56,8 +56,12 @@
       >
         <v-icon>mdi-menu</v-icon>
       </v-btn>
-      <v-btn @click="dialog =true">ログイン/新規登録
-      </v-btn>
+      <div v-if="auth">
+        <v-btn @click="logout">ログアウト</v-btn>
+      </div>
+      <div v-else>
+        <v-btn @click="dialog =true">ログイン/新規登録</v-btn>
+      </div>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -143,16 +147,6 @@
                       required
                       class="py-2"
                       @input="blurInput"
-                    ></v-text-field>
-                    <v-text-field
-                    @input="blurInput"
-                      ref="screen_name"
-                      v-model="registration.screen_name"
-                      :rules="nicknameRules"
-                      label="ニックネーム"
-                      placeholder="Rio"
-                      required
-                      class="py-2"
                     ></v-text-field>
                     <v-text-field
                     @input="blurInput"
@@ -281,7 +275,7 @@ export default {
         errors: {},
         step: 1,
         randomNumber: '',
-        registration: {name: '', screen_name: '', email: '', password: '', confirmationPassword: ''},
+        registration: {name: '', email: '', password: '', confirmationPassword: ''},
         show4: false,
         nameRules: [
           v => !!v || '入力が必要です',
@@ -305,7 +299,6 @@ export default {
       dialog: false,
       email: '',
       password: '',
-      auth: false,
       clipped: false,
       drawer: false,
       fixed: false,
@@ -334,6 +327,9 @@ export default {
                 case 2: return '会員登録'
                 default: return 'パスワード再設定'
                 }
+            },
+            auth(){
+              return this.$store.getters.user.uid ? true : false
             }
         },
         created() {
@@ -364,24 +360,9 @@ export default {
         },
         methods: {
              login() {
-      this.$store.dispatch('login', {email: this.email, password: this.password})
-   },
-          isLoad(){
-            this.loaded = true;
-          },
-            toBase64Url(url, callback){
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function() {
-                var reader = new FileReader();
-                reader.onloadend = function() {
-                callback(reader.result);
-                }
-                reader.readAsDataURL(xhr.response);
-            };
-            xhr.open('GET', url);
-            xhr.responseType = 'blob';
-            xhr.send();
-            },
+                  this.$store.dispatch('login', {email: this.email, password: this.password})
+                  this.dialog = false;
+              },
             blurInput() {
               var registrationArray = Object.values(this.registration).map(registration => {
                 return registration;
@@ -400,17 +381,14 @@ export default {
                     password_confirmation: this.registration.confirmationPassword,
                     profile_image: this.avatar
                 };
-                axios.post(url, params)
-                .then(() => location.href = '/home')
-                .catch((error) => {
-                    let that = this;
-                    var responseErrors = error.response.data.errors;
-                    var errors = {};
-                    for(var key in responseErrors) {
-                        errors[key] = responseErrors[key][0];
-                    }
-                    that.registrationErrors = errors;
-                });
+                this.$store.dispatch('register', params)
+            },
+            logout(){
+              firebase.auth().signOut().then(() => {
+                this.$store.dispatch('logout')
+              }).catch((error) => {
+                // An error happened.
+              });
             },
             sendPasswordResetLink(){
               this.progress = true;

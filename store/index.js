@@ -2,8 +2,8 @@
 import firebase from '~/plugins/firebase'
 export const state = () => ({
     user: {
-    uid: '',
-    email: '',
+        uid: '',
+        email: '',
     },
 })
 export const getters = {
@@ -32,6 +32,29 @@ export const actions = {
         }).catch((error) => {
             alert(error)
         })
+    },
+    logout({ commit }) {
+        commit('getData', { uid: '', email: '' })
+    },
+    register({ commit }, payload) {
+        firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+        .then((user) => {
+            const newUser = user.user;
+                newUser.updateProfile({
+                    displayName: payload.name,
+                    photoURL: '',
+                });
+            const db = firebase.firestore();
+            db.collection('users').doc(newUser.uid).set({ name: payload.name, email: payload.email, })
+                .then(ref => {
+                console.log('Add ID: ', ref.id)
+                })
+                commit('getData', { uid: newUser.uid, email: newUser.email })
+            })
+        .catch((error) => {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+        });
     },
     loginGoogle ({ dispatch }) {
         var provider = new firebase.auth.GoogleAuthProvider()

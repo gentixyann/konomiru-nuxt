@@ -14,7 +14,8 @@
     "@nuxtjs/firebase": "^7.4.1",
     "core-js": "^3.8.2",
     "firebase": "^8.2.4",
-    "nuxt": "^2.14.12"
+    "nuxt": "^2.14.12",
+    "vuex": "^3.6.0"
   },
   "devDependencies": {
     "@nuxt/types": "^2.14.12",

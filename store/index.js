@@ -19,16 +19,18 @@ export const mutations = {
     }
 }
 export const actions = {
-    login({ commit }, payload) {
+    login({ dispatch, commit }, payload) {
     firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
         .then(user => {
             console.log('成功！')
             firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                console.log(user)
                 commit('getData', { uid: user.uid, email: user.email })
+                dispatch('getLikedMovies', user.uid)
+                console.log(dispatch('getLikedMovies', user.uid));
             }
             })
+
         }).catch((error) => {
             alert(error)
         })
@@ -56,20 +58,29 @@ export const actions = {
             var errorMessage = error.message;
         });
     },
-    loginGoogle ({ dispatch }) {
-        var provider = new firebase.auth.GoogleAuthProvider()
-        firebase.auth().signInWithPopup(provider).then(function (result) {
-          dispatch('checkLogin')
-        }).catch(function (error) {
-          console.log(error)
-        })
-      },
-      checkLogin ({ commit }) {
-        firebase.auth().onAuthStateChanged(function (user) {
-          if (user) {
-            commit('getData', { uid: user.uid, email: user.email })
-            commit('switchLogin')
-          }
-        })
-      },
+    getLikedMovies(uid){
+        const db = firebase.firestore();
+        db.collection(`users/${uid}/movies`).get().then(function(query) {
+            query.forEach(function(doc) {
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
+            });
+        });
+    }
+    // loginGoogle ({ dispatch }) {
+    //     var provider = new firebase.auth.GoogleAuthProvider()
+    //     firebase.auth().signInWithPopup(provider).then(function (result) {
+    //       dispatch('checkLogin')
+    //     }).catch(function (error) {
+    //       console.log(error)
+    //     })
+    //   },
+    //   checkLogin ({ commit }) {
+    //     firebase.auth().onAuthStateChanged(function (user) {
+    //       if (user) {
+    //         commit('getData', { uid: user.uid, email: user.email })
+    //         commit('switchLogin')
+    //       }
+    //     })
+    //   },
 }

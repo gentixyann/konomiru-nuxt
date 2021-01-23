@@ -2,7 +2,7 @@
     <div>
         <v-card-title>{{ title }}</v-card-title>
         <v-card-subtitle>{{ release_date }}</v-card-subtitle>
-        <v-card-text>{{ overview }}</v-card-text>
+        <v-card-text>{{ overview.substr( 0, 50 ) }}...</v-card-text>
     </div>
 </template>
 
@@ -18,7 +18,7 @@ export default {
     //         type: Number
     //     },
     //     overview: {
-    //         type: Array
+    //         type: String
     //     }
     // }],
 }

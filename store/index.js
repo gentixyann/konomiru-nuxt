@@ -10,6 +10,9 @@ export const state = () => ({
 export const getters = {
     user: state => {
         return state.user
+    },
+    likedMovies: state => {
+        return state.user.likedMovies
     }
 }
 export const mutations = {

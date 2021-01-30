@@ -1,4 +1,5 @@
 <template>
+  <div>
     <v-container>
         <v-row>
             <router-link to="/search">検索へ</router-link>
@@ -10,7 +11,7 @@
         </v-row>
         <v-row v-if="ready">
             <v-col v-for="(movie, i) in movies" :key="i">
-                <v-card class="d-flex" :style="selectId == i ? {backgroundColor: '#c9fbff'} : ''" @click="select(i, movie)" width="330"><!--qiita-->
+                <v-card class="d-flex" :style="selectId == i ? {backgroundColor: '#c9fbff'} : ''" @click="select(i, movie)" width="330">
                     <div>
                         <v-img v-bind:src="'http://image.tmdb.org/t/p/w154/' + movie.poster_path"></v-img>
                     </div>
@@ -20,12 +21,23 @@
                 </v-card>
             </v-col>
         </v-row>
-        <v-btn class="mx-2" fab fixed right bottom dark small color="primary" @click="save">
+        <v-btn class="mx-2" fab fixed right bottom dark small color="primary" @click="save" :disabled="selectId==-1">
             <v-icon dark>
                 mdi-plus
             </v-icon>
         </v-btn>
     </v-container>
+    <v-snackbar v-model="snackbar" :multi-line="multiLine" :timeout="timeout">
+      <div v-html="text"></div>
+      <template v-slot:action="{ attrs }">
+        <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
+            <v-icon dark right>
+                mdi-close
+            </v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
+  </div>
 </template>
 
 <script>
@@ -46,6 +58,10 @@ export default {
             apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
             ready: false,
             user: this.$store.getters.user,
+            multiLine: true,
+            snackbar: false,
+            text: null,
+            timeout: 2000,
         }
     },
     methods: {
@@ -73,12 +89,24 @@ export default {
                 console.log('Add ID: ', ref.id)
             })
         },
-        save(){
-            const db = firebase.firestore();
-            const data = {id: this.movie.id, title: this.movie.title }
-            const data2 = {userId: this.user.uid }
-            db.collection(`users/${this.user.uid}/movies`).add(data)
-            db.collection(`likedMovies/${this.movie.id}/users`).add(data2)
+        async save(){
+            this.text = null;
+            const isRegistered = this.$store.getters.likedMovies.some((likedMovie) => {
+                return likedMovie.id === this.movie.id;
+            })
+            if(isRegistered) {
+                this.text = 'お忘れですか？<br>あなたは既にこの作品をマイラブしてます';
+            } else {
+                const db = firebase.firestore();
+                const data = {id: this.movie.id, title: this.movie.title }
+                const data2 = {userId: this.user.uid }
+                await db.collection(`users/${this.user.uid}/movies`).add(data)
+                await db.collection(`likedMovies/${this.movie.id}/users`).add(data2)
+                this.$store.dispatch('getLikedMovies',this.$store.state.user.uid);
+                this.text = 'マイラブに追加しました';
+            }
+                this.snackbar = true;
+                this.selectId = -1;
         },
         select(index, movie){
             if(index == this.selectId){

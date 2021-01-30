@@ -1,11 +1,33 @@
 <template>
     <div>
-        <!-- <card-template :movies="movies[0]"></card-template> -->
-        {{ likedMovies }}
+        <v-list-item three-line class="px-3">
+            <v-list-item-avatar size="80">
+                <!-- <avatar @progress="progress = $event" @sizeDialog="sizeDialog = $event"></avatar> -->
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <!-- <follower></follower> -->
+            </v-list-item-content>
+            <div class="font-weight-light grey--text title mb-2">
+                <!-- <buttons></buttons> -->
+            </div>
+        </v-list-item>
+        <v-row v-if="ready">
+            <v-col v-for="(movie, i) in movies" :key="i">
+                <v-card class="d-flex" :style="selectId == i ? {backgroundColor: '#c9fbff'} : ''" @click="select(i, movie)" width="330"><!--qiita-->
+                    <div>
+                        <v-img v-bind:src="'http://image.tmdb.org/t/p/w154/' + movie.poster_path"></v-img>
+                    </div>
+                    <div>
+                        <card-template :title="movie.title" :release_date="movie.release_date" :overview="movie.overview" />
+                    </div>
+                </v-card>
+            </v-col>
+        </v-row>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 import CardTemplate from "../components/templates/CardTemplate";
 export default {
     components: {
@@ -26,19 +48,23 @@ export default {
             return this.$store.state.user.likedMovies;
         }
     },
+    watch:{
+        likedMovies(){
+            this.getMovies()
+        },
+    },
     created(){
-        // movie_id
-        console.log(this.likedMovies)
+        this.getMovies()
     },
     methods: {
-        getMovies(id) {
+        getMovies() {
             for (let i = 0; i < this.likedMovies.length; i++) {
-                axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${this.apiKey}`)
+                axios.get(`https://api.themoviedb.org/3/movie/${this.likedMovies[i].id}?api_key=${this.apiKey}&language=en-US`)
                 .then(response => {
-                    this.movies = response.data.results
-                    this.ready = true;
+                    this.movies.push(response.data);
                 })
             }
+            this.ready = true;
         },
     }
 }

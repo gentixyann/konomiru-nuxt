@@ -30,7 +30,7 @@
         app
         >
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-        <v-btn
+        <!-- <v-btn
             icon
             @click.stop="miniVariant = !miniVariant"
         >
@@ -47,15 +47,15 @@
             @click.stop="fixed = !fixed"
         >
             <v-icon>mdi-minus</v-icon>
-        </v-btn>
+        </v-btn> -->
         <v-toolbar-title v-text="title" />
         <v-spacer />
-        <v-btn
+        <!-- <v-btn
             icon
             @click.stop="rightDrawer = !rightDrawer"
         >
             <v-icon>mdi-menu</v-icon>
-        </v-btn>
+        </v-btn> -->
         <div v-if="auth">
             <v-btn @click="logout">ログアウト</v-btn>
         </div>
@@ -122,15 +122,15 @@
                             </div>
                         </div>
                         </div>
-                        <div class="d-flex mb-5 justify-content-start">
-                        <v-btn color="success" class="mr-4" @click="login">
+                        <div class="mb-5">
+                        <v-btn color="success mb-3" block class="mr-4" @click="login">
                         ログイン
                         </v-btn>
-                        <v-btn color="indigo white--text" class="mr-4" @click="step++">
+                        <!-- <v-btn color="indigo white--text mb-3" block class="mr-4" @click="step++">
                         会員登録
-                        </v-btn>
-                        <v-btn color="indigo white--text" class="mr-4" @click="loginGoogle">
-                        loginGoogle
+                        </v-btn> -->
+                        <v-btn color="indigo white--text mb-3" block class="mr-4" @click="loginGoogle">
+                        Googleログイン
                         </v-btn>
                         </div>
                         <a class="btn btn-link mb-3" style="display: block;" @click="step--">パスワードをお忘れの場合</a>
@@ -317,7 +317,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Vuetify.js'
+      title: 'Konomiru'
     }
   },
        computed: {

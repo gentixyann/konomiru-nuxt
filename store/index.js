@@ -2,8 +2,10 @@
 import firebase from '~/plugins/firebase'
 export const state = () => ({
     user: {
-        uid: '',
-        email: '',
+        uid: null,
+        name: null,
+        email: null,
+        photoURL: null,
         likedMovies: [],
     },
 })
@@ -18,7 +20,9 @@ export const getters = {
 export const mutations = {
     getData (state, payload) {
         state.user.uid = payload.uid
+        state.user.name = payload.name
         state.user.email = payload.email
+        state.user.photoURL = payload.photoURL
     },
     likedMovies (state, payload) {
         state.user.likedMovies = payload
@@ -30,7 +34,7 @@ export const actions = {
         .then(user => {
             firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                commit('getData', { uid: user.uid, email: user.email })
+                commit('getData', { uid: user.uid, email: user.email, photoURL: null })
                 dispatch('getLikedMovies', user.uid)
             }
             })
@@ -40,7 +44,7 @@ export const actions = {
         })
     },
     logout({ commit }) {
-        commit('getData', { uid: '', email: '' });
+        commit('getData', { uid: '', email: '', photoURL: null });
     },
     async register({ commit, dispatch }, payload) {
         try {
@@ -52,7 +56,7 @@ export const actions = {
             });
             const db = firebase.firestore();
             await db.collection('users').doc(newUser.uid).set({ name: payload.name, email: payload.email, })
-                commit('getData', { uid: newUser.uid, email: newUser.email })
+                commit('getData', { uid: newUser.uid, email: newUser.email, photoURL: null })
         } catch (error) {
             console.log('error')
         }
@@ -89,8 +93,9 @@ export const actions = {
     async loadUser({commit, dispatch}){
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                commit('getData', { uid: user.uid, email: user.email })
+                commit('getData', { uid: user.uid, name: user.displayName, email: user.email, photoURL: user.photoURL })
                 dispatch('getLikedMovies', user.uid)
+                console.log(user)
             }
         })
     },
@@ -99,7 +104,7 @@ export const actions = {
         firebase.auth().signInWithPopup(provider).then(function (result) {
             const db = firebase.firestore();
             db.collection('users').doc(result.user.uid).set({ name: result.user.displayName, email: result.user.email, })
-                commit('getData', { uid: result.user.uid, email: result.user.email })
+                commit('getData', { uid: result.user.uid, name: result.user.displayName, email: result.user.email, photoURL: user.photoURL })
                 dispatch('getLikedMovies', result.user.uid)
         }).catch(function (error) {
             console.log(error)

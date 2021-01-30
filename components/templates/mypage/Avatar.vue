@@ -1,8 +1,18 @@
 <template>
     <div>
-        <v-avatar color="indigo" size="80" @click="btnclick2">
-            <v-img :src="'storage/image/avatar/' +  requestedUserInfo.profile_image"></v-img>
-        </v-avatar>
+        <v-list three-line>
+            <v-list-item three-line class="px-3">
+                <v-list-item-avatar size="100">
+                    <v-avatar color="indigo" size="120" @click="btnclick2">
+                        <v-img :src="user.photoURL"></v-img>
+                    </v-avatar>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                    <v-list-item-title style="text-align: center">{{ user.name }}</v-list-item-title>
+                    <v-list-item-subtitle></v-list-item-subtitle>
+                </v-list-item-content>
+            </v-list-item>
+        </v-list>
         <input style="display: none" ref="avatar" type="file" accept="image/jpeg, image/jpg, image/png" @input="changeAvatar">
     </div>
 </template>
@@ -11,35 +21,22 @@
 import Vue from "vue";
 import axios from 'axios';
 export type DataType = {
-    user: any,
     visitor: any,
     windowSize: { x: number, y: number},
 }
 export default Vue.extend({
     data(): DataType{
         return {
-            user: '',
             visitor: '',
             windowSize: this.$store.getters.windowSize
-        }
-    },
-    watch: {
-        user: {
-            immediate: true,
-            handler(){
-                this.user = this.$store.getters.requestedUser;
-            }
-        },
-        visitor: {
-            immediate: true,
-            handler(){
-                this.visitor = this.$store.getters.visitor;
-            }
         }
     },
     computed: {
         requestedUserInfo(): object{
             return this.user;
+        },
+        user(){
+            return this.$store.getters.user;
         }
     },
     methods: {

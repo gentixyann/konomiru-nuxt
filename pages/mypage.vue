@@ -1,16 +1,6 @@
 <template>
     <div>
-        <v-list-item three-line class="px-3">
-            <v-list-item-avatar size="80">
-                <!-- <avatar @progress="progress = $event" @sizeDialog="sizeDialog = $event"></avatar> -->
-            </v-list-item-avatar>
-            <v-list-item-content>
-                <!-- <follower></follower> -->
-            </v-list-item-content>
-            <div class="font-weight-light grey--text title mb-2">
-                <!-- <buttons></buttons> -->
-            </div>
-        </v-list-item>
+        <avatar></avatar>
         <v-row v-if="ready">
             <v-col v-for="(movie, i) in movies" :key="i">
                 <v-card class="d-flex" :style="selectId == i ? {backgroundColor: '#c9fbff'} : ''" @click="select(i, movie)" width="330"><!--qiita-->
@@ -29,9 +19,13 @@
 <script>
 import axios from 'axios';
 import CardTemplate from "../components/templates/CardTemplate";
+import Avatar from "../components/templates/mypage/Avatar";
+import Buttons from "../components/templates/mypage/Buttons";
 export default {
     components: {
-        CardTemplate
+        CardTemplate,
+        Avatar,
+        Buttons
     },
     data() {
         return {

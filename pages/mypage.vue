@@ -1,6 +1,7 @@
 <template>
     <div>
-        <card-template></card-template>
+        <!-- <card-template :movies="movies[0]"></card-template> -->
+        {{ likedMovies }}
     </div>
 </template>
 
@@ -20,19 +21,24 @@ export default {
             user: this.$store.getters.user,
         }
     },
+    computed: {
+        likedMovies(){
+            return this.$store.state.user.likedMovies;
+        }
+    },
     created(){
-        movie_id
+        // movie_id
+        console.log(this.likedMovies)
     },
     methods: {
         getMovies(id) {
-            // &language=ja
-            axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${this.apiKey}&language=en-US`)
-            .then(response => {
-                this.movies = response.data.results
-                console.log(this.movies);
-                this.ready = true;
-            })
-            console.log(this.movies);
+            for (let i = 0; i < this.likedMovies.length; i++) {
+                axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${this.apiKey}`)
+                .then(response => {
+                    this.movies = response.data.results
+                    this.ready = true;
+                })
+            }
         },
     }
 }

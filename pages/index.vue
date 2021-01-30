@@ -54,10 +54,8 @@ export default {
             axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${this.apiKey}`)
             .then(response => {
                 this.movies = response.data.results
-                console.log(this.movies);
                 this.ready = true;
             })
-            console.log(this.movies);
 
         },
         getItem(movie) {

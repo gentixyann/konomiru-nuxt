@@ -87,7 +87,7 @@
             >
             <div id="login" class="example">
                 <div class="hello" style="opacity: 0.95;">
-                    <v-card class="mx-auto" max-width="500">
+                    <v-card class="mx-auto" max-width="600">
                         <v-card-title class="title font-weight-regular justify-space-between">
                         <h4>{{ currentTitle }}</h4>
                         <v-avatar color="primary lighten-2" class="subheading white--text" size="24" v-text="step"></v-avatar>
@@ -299,19 +299,24 @@ export default {
       fixed: false,
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
+          icon: 'mdi-home',
+          title: 'Home',
           to: '/'
         },
+        // {
+        //   icon: 'mdi-chart-bubble',
+        //   title: 'Inspire',
+        //   to: '/inspire'
+        // },
         {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
-        },
-        {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-account',
           title: 'Mypage',
           to: '/mypage'
+        },
+        {
+          icon: 'mdi-magnify',
+          title: 'Search',
+          to: '/search'
         },
       ],
       miniVariant: false,
@@ -335,11 +340,12 @@ export default {
         methods: {
             loginGoogle(){
                 this.$store.dispatch('loginGoogle');
+                this.dialog = false;
             },
-             login() {
-                  this.$store.dispatch('login', {email: this.email, password: this.password})
-                  this.dialog = false;
-              },
+            login() {
+                this.$store.dispatch('login', {email: this.email, password: this.password})
+                this.dialog = false;
+            },
             blurInput() {
               var registrationArray = Object.values(this.registration).map(registration => {
                 return registration;

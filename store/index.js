@@ -6,8 +6,10 @@ export const state = () => ({
         name: null,
         email: null,
         photoURL: null,
+        text: null,
         likedMovies: [],
     },
+    ready: false
 })
 export const getters = {
     user: state => {
@@ -15,7 +17,10 @@ export const getters = {
     },
     likedMovies: state => {
         return state.user.likedMovies
-    }
+    },
+    text: state => {
+        return state.user.text
+    },
 }
 export const mutations = {
     getData (state, payload) {
@@ -23,9 +28,13 @@ export const mutations = {
         state.user.name = payload.name
         state.user.email = payload.email
         state.user.photoURL = payload.photoURL
+        state.user.text = payload.text
     },
     likedMovies (state, payload) {
         state.user.likedMovies = payload
+    },
+    ready (state, payload) {
+        state.ready = payload
     },
 }
 export const actions = {
@@ -34,17 +43,18 @@ export const actions = {
         .then(user => {
             firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                commit('getData', { uid: user.uid, email: user.email, photoURL: null })
+                commit('getData', { uid: user.uid,name: user.displayName, email: user.email, photoURL: user.photoURL, text: user.text })
                 dispatch('getLikedMovies', user.uid)
             }
-            })
+        })
 
         }).catch((error) => {
             alert(error)
         })
     },
     logout({ commit }) {
-        commit('getData', { uid: '', email: '', photoURL: null });
+        commit('getData', { uid: null, name: null, email: null, photoURL: null, text: null });
+        commit('likedMovies', [])
     },
     async register({ commit, dispatch }, payload) {
         try {
@@ -52,32 +62,15 @@ export const actions = {
             const newUser = response.user;
             newUser.updateProfile({
                 displayName: payload.name,
-                photoURL: '',
+                photoURL: null,
+                text: null
             });
             const db = firebase.firestore();
-            await db.collection('users').doc(newUser.uid).set({ name: payload.name, email: payload.email, })
-                commit('getData', { uid: newUser.uid, email: newUser.email, photoURL: null })
+            await db.collection('users').doc(newUser.uid).set({ name: payload.name, email: payload.email, photoURL: null, text: null})
+                commit('getData', { uid: newUser.uid, name: newUser.displayName, email: newUser.email, photoURL: null, text: null })
         } catch (error) {
             console.log('error')
         }
-        // firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
-        // .then((user) => {
-        //     const newUser = user.user;
-        //         newUser.updateProfile({
-        //             displayName: payload.name,
-        //             photoURL: '',
-        //         });
-        //     const db = firebase.firestore();
-        //     db.collection('users').doc(newUser.uid).set({ name: payload.name, email: payload.email, })
-        //         .then(ref => {
-        //         console.log('Add ID: ', ref.id)
-        //         })
-        //         commit('getData', { uid: newUser.uid, email: newUser.email })
-        //     })
-        // .catch((error) => {
-        //     var errorCode = error.code;
-        //     var errorMessage = error.message;
-        // });
     },
     getLikedMovies({commit},uid){
         let likedMovies = [];
@@ -86,16 +79,17 @@ export const actions = {
             query.forEach(function(doc) {
                 likedMovies.push(doc.data());
             });
-            console.log(likedMovies)
             commit('likedMovies', likedMovies)
         })
     },
     async loadUser({commit, dispatch}){
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                commit('getData', { uid: user.uid, name: user.displayName, email: user.email, photoURL: user.photoURL })
-                dispatch('getLikedMovies', user.uid)
-                console.log(user)
+                const db = firebase.firestore();
+                db.collection(`users`).doc(user.uid).get().then(query => {
+                    commit('getData', { uid: user.uid, name: user.displayName, email: user.email, photoURL: user.photoURL, text: query.data().text })
+                    dispatch('getLikedMovies', user.uid)
+                })
             }
         })
     },
@@ -103,19 +97,27 @@ export const actions = {
         var provider = new firebase.auth.GoogleAuthProvider()
         firebase.auth().signInWithPopup(provider).then(function (result) {
             const db = firebase.firestore();
-            db.collection('users').doc(result.user.uid).set({ name: result.user.displayName, email: result.user.email, })
-                commit('getData', { uid: result.user.uid, name: result.user.displayName, email: result.user.email, photoURL: user.photoURL })
-                dispatch('getLikedMovies', result.user.uid)
+            if(db.collection(`users`).doc(result.user.uid).get()){//過去にログインがある場合
+                try {
+                    db.collection(`users`).doc(result.user.uid).get().then(query => {
+                        commit('getData', { uid: result.user.uid, name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, text: query.data().text })
+                        dispatch('getLikedMovies', result.user.uid)
+                    })
+                } catch (error) {
+                    dispatch('logout')
+                }
+            } else {//初めてのログインの場合
+                db.collection('users').doc(result.user.uid).set({ name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL})
+            }
         }).catch(function (error) {
             console.log(error)
         })
     },
-    checkLogin ({ commit }) {
-        firebase.auth().onAuthStateChanged(function (user) {
-            if (user) {
-                commit('getData', { uid: user.uid, email: user.email })
-                // commit('switchLogin')
-            }
-        })
-    },
+    // checkLogin ({ commit }) {
+    //     firebase.auth().onAuthStateChanged(function (user) {
+    //         if (user) {
+    //             commit('getData', { uid: user.uid, email: user.email })
+    //         }
+    //     })
+    // },
 }

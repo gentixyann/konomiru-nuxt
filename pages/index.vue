@@ -20,6 +20,9 @@
                     </div>
                 </v-card>
             </v-col>
+            <v-col v-if="movies.length%3 !== 0">
+                <div style="width: 330px"></div>
+            </v-col>
         </v-row>
         <v-btn class="mx-2" fab fixed right bottom dark small color="primary" @click="save" :disabled="selectId==-1">
             <v-icon dark>
@@ -54,14 +57,17 @@ export default {
             selectId: -1,
             movie: '',
             movies: [],
-            // movie: [],
             apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
-            ready: false,
             user: this.$store.getters.user,
             multiLine: true,
             snackbar: false,
             text: null,
             timeout: 2000,
+        }
+    },
+    computed: {
+        ready(){
+            return this.$store.state.ready;
         }
     },
     methods: {
@@ -70,17 +76,17 @@ export default {
             axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${this.apiKey}`)
             .then(response => {
                 this.movies = response.data.results
-                this.ready = true;
+                this.$store.commit('ready', true)
             })
 
         },
         getItem(movie) {
-             this.movie = movie;
-                console.log('押した' + movie.title);
-            },
-            submit () {
-                const db = firebase.firestore()
-                let dbUsers = db.collection('users')
+            this.movie = movie;
+            console.log('押した' + movie.title);
+        },
+        submit () {
+            const db = firebase.firestore()
+            let dbUsers = db.collection('users')
             dbUsers.add({
                 name: this.user.name,
                 email: this.user.email,

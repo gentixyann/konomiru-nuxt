@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app dark v-cloak>
     <v-main>
       <v-container>
         <nuxt />
@@ -22,3 +22,8 @@ export default {
   }
 }
 </script>
+<style>
+    [v-cloak] {
+        display: none;
+    }
+</style>

@@ -7,9 +7,9 @@
                         <v-img :src="user.photoURL"></v-img>
                     </v-avatar>
                 </v-list-item-avatar>
-                <v-list-item-content>
-                    <v-list-item-title style="text-align: center">{{ user.name }}</v-list-item-title>
-                    <v-list-item-subtitle></v-list-item-subtitle>
+                <v-list-item-content class="px-4" style="max-width: 600px;margin: auto">
+                    <v-list-item-title class="mb-2 text-center" style="font-size: 24px;">{{ user.name }}</v-list-item-title>
+                    <v-textarea outlined label="自己紹介" :value="text" rows="2" row-height="10" v-model="text" @blur="saveText" style="font-size: 16px"></v-textarea>
                 </v-list-item-content>
             </v-list-item>
         </v-list>
@@ -20,15 +20,18 @@
 <script lang="ts">
 import Vue from "vue";
 import axios from 'axios';
+import firebase from '~/plugins/firebase'
 export type DataType = {
     visitor: any,
     windowSize: { x: number, y: number},
+    text: string|null
 }
 export default Vue.extend({
     data(): DataType{
         return {
             visitor: '',
-            windowSize: this.$store.getters.windowSize
+            windowSize: this.$store.getters.windowSize,
+            text: null,
         }
     },
     computed: {
@@ -37,9 +40,24 @@ export default Vue.extend({
         },
         user(){
             return this.$store.getters.user;
+        },
+        userText(){
+            return this.$store.getters.user.text;
+        },
+    },
+    watch: {
+        userText:{
+            handler(){
+                this.text = this.userText
+            },
+            immediate: true
         }
     },
     methods: {
+        saveText(){
+            const db = firebase.firestore();
+            db.collection('users').doc(this.user.uid).update({ text: this.text})
+        },
         btnclick2(): void {
             if(this.visitor.id == this.user.id){
                 const element: HTMLElement | any = this.$refs.avatar;

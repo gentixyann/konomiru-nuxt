@@ -3,7 +3,7 @@
         <avatar></avatar>
         <v-row v-if="ready">
             <v-col v-for="(movie, i) in movies" :key="i">
-                <router-link :to="{ name: 'profile-uid-mid', params: { uid: $route.params.uid, mid: movie.id } }">
+                <router-link :to="{ name: 'profile-uid-mid', params: { uid: $route.params.uid, mid: likedMovies[i].mid } }">
                     <v-card class="d-flex" style="position:relative;z-index: 1;" :style="selectId == i ? {backgroundColor: '#c9fbff'} : ''" width="330"><!--qiita-->
                         <div>
                             <v-img v-bind:src="'http://image.tmdb.org/t/p/w154/' + movie.poster_path"></v-img>

@@ -1,9 +1,6 @@
 <template>
   <div>
     <v-container>
-        <v-row>
-            <router-link to="/search">検索へ</router-link>
-        </v-row>
         <v-row class="text-center">
             <v-col cols="12">
                 みんなの好きな作品

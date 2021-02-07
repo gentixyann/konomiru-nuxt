@@ -15,7 +15,7 @@
                       <v-img v-bind:src="'http://image.tmdb.org/t/p/w154/' + movie.poster_path"></v-img>
                     </div>
                     <div>
-                        <card-template :title="movie.title" :release_date="movie.release_date" :overview="movie.overview" />
+                        <card-template v-bind="movie" />
                     </div>
                 </v-card>
             </v-col>

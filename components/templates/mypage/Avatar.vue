@@ -9,7 +9,7 @@
                 </v-list-item-avatar>
                 <v-list-item-content class="px-4" style="max-width: 600px;margin: auto">
                     <v-list-item-title class="mb-2 text-center" style="font-size: 24px;">{{ user.name }}</v-list-item-title>
-                    <v-textarea outlined label="自己紹介" :value="text" rows="2" row-height="10" v-model="text" @blur="saveText" style="font-size: 16px"></v-textarea>
+                    <v-textarea outlined label="自己紹介" rows="2" row-height="10" v-model="text" @blur="saveText" style="font-size: 16px"></v-textarea>
                 </v-list-item-content>
             </v-list-item>
         </v-list>

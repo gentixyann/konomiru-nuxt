@@ -11,6 +11,8 @@ export const state = () => ({
     },
     ready: false,
     apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
+    windowSize: {x: 0, y: 0},
+    introduction: true,
 })
 export const getters = {
     user: state => {
@@ -21,6 +23,9 @@ export const getters = {
     },
     text: state => {
         return state.user.text
+    },
+    windowSize: state => {
+        return state.windowSize
     },
 }
 export const mutations = {
@@ -37,6 +42,13 @@ export const mutations = {
     ready (state, payload) {
         state.ready = payload
     },
+    windowSize(state,size){
+        state.windowSize = size;
+    },
+    introduction(state,payload){
+        state.introduction = payload;
+        console.log(payload)
+    }
 }
 export const actions = {
     login({ dispatch, commit }, payload) {
@@ -69,6 +81,7 @@ export const actions = {
             const db = firebase.firestore();
             await db.collection('users').doc(newUser.uid).set({ name: payload.name, email: payload.email, photoURL: null, text: null})
                 commit('getData', { uid: newUser.uid, name: newUser.displayName, email: newUser.email, photoURL: null, text: null })
+                commit('introduction', false)
         } catch (error) {
             console.log('error')
         }
@@ -78,10 +91,12 @@ export const actions = {
         const db = firebase.firestore();
         db.collection(`users/${uid}/movies`).get().then(query => {
             query.forEach(function(doc) {
-                likedMovies.push(doc.data());
+                let mid = {mid: doc.id}
+                let movies = Object.assign(mid, doc.data());
+                likedMovies.push(movies);
             });
-            commit('likedMovies', likedMovies)
         })
+        .then(() => commit('likedMovies', likedMovies))
     },
     async loadUser({commit, dispatch}){
         firebase.auth().onAuthStateChanged(function (user) {
@@ -109,16 +124,10 @@ export const actions = {
                 }
             } else {//初めてのログインの場合
                 db.collection('users').doc(result.user.uid).set({ name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL})
+                commit('introduction', false)
             }
         }).catch(function (error) {
             console.log(error)
         })
     },
-    // checkLogin ({ commit }) {
-    //     firebase.auth().onAuthStateChanged(function (user) {
-    //         if (user) {
-    //             commit('getData', { uid: user.uid, email: user.email })
-    //         }
-    //     })
-    // },
 }

@@ -126,9 +126,9 @@
                         <v-btn color="success mb-3" block class="mr-4" @click="login">
                         ログイン
                         </v-btn>
-                        <!-- <v-btn color="indigo white--text mb-3" block class="mr-4" @click="step++">
+                        <v-btn color="indigo white--text mb-3" block class="mr-4" @click="step++">
                         会員登録
-                        </v-btn> -->
+                        </v-btn>
                         <v-btn color="indigo white--text mb-3" block class="mr-4" @click="loginGoogle">
                         Googleログイン
                         </v-btn>

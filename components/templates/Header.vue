@@ -29,7 +29,7 @@
         fixed
         app
         >
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer" :disabled="!auth" />
         <!-- <v-btn
             icon
             @click.stop="miniVariant = !miniVariant"
@@ -341,7 +341,15 @@ export default {
                 this.items[1] = {icon: 'mdi-account', title: 'Mypage', to: { name: 'profile-uid', params: { uid: this.mypageId } } }
             },
             immediate: true
-        }
+        },
+        auth:{
+            handler(){
+                if(!this.auth){
+                    this.drawer = false;
+                }
+            },
+            immediate: true
+        },
     },
     methods: {
         loginGoogle(){
@@ -361,20 +369,17 @@ export default {
             })
         },
         register() {
-            var url = '/register';
             var params = {
                 name: this.registration.name,
-                screen_name: this.registration.screen_name,
                 email: this.registration.email,
                 password: this.registration.password,
-                password_confirmation: this.registration.confirmationPassword,
-                profile_image: this.avatar
             };
             this.$store.dispatch('register', params)
         },
         logout(){
             firebase.auth().signOut().then(() => {
             this.$store.dispatch('logout')
+            this.$router.push({ name: 'index' })
             }).catch((error) => {
             // An error happened.
             });

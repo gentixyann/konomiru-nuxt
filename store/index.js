@@ -80,7 +80,7 @@ export const actions = {
             });
             const db = firebase.firestore();
             await db.collection('users').doc(newUser.uid).set({ name: payload.name, email: payload.email, photoURL: null, text: null})
-                commit('getData', { uid: newUser.uid, name: newUser.displayName, email: newUser.email, photoURL: null, text: null })
+                commit('getData', { uid: newUser.uid, name: payload.name, email: payload.name, photoURL: null, text: null })
                 commit('introduction', false)
         } catch (error) {
             console.log('error')

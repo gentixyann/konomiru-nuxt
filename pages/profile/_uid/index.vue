@@ -4,7 +4,7 @@
         <v-row v-if="ready">
             <v-col v-for="(movie, i) in movies" :key="i">
                 <router-link :to="{ name: 'profile-uid-mid', params: { uid: $route.params.uid, mid: likedMovies[i].mid } }">
-                    <v-card class="d-flex" style="position:relative;z-index: 1;" :style="selectId == i ? {backgroundColor: '#c9fbff'} : ''" width="330"><!--qiita-->
+                    <v-card class="d-flex" style="position:relative;z-index: 1;" width="330"><!--qiita-->
                         <div>
                             <v-img v-bind:src="'http://image.tmdb.org/t/p/w154/' + movie.poster_path"></v-img>
                         </div>
@@ -34,7 +34,6 @@ export default {
     },
     data() {
         return {
-            selectId: -1,
             movie: '',
             movies: [],
             apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
@@ -49,6 +48,9 @@ export default {
             return this.$store.state.ready;
         }
     },
+    mounted(){
+        console.log(this.movies)
+    },
     watch:{
         likedMovies(){
             if (this.likedMovies) {
@@ -62,9 +64,9 @@ export default {
         this.getMovies()
     },
     methods: {
-        getMovies() {
+        async getMovies() {
             for (let i = 0; i < this.likedMovies.length; i++) {
-                axios.get(`https://api.themoviedb.org/3/movie/${this.likedMovies[i].id}?api_key=${this.apiKey}&language=en-US`)
+                await axios.get(`https://api.themoviedb.org/3/movie/${this.likedMovies[i].id}?api_key=${this.apiKey}&language=en-US`)
                 .then(response => {
                     this.movies.push(response.data);
                 })

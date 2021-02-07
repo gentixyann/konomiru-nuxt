@@ -16,7 +16,7 @@
                         <v-img v-bind:src="'http://image.tmdb.org/t/p/w154/' + movie.poster_path"></v-img>
                     </div>
                     <div>
-                        <card-template :title="movie.title" :release_date="movie.release_date" :overview="movie.overview" />
+                        <card-template v-bind="movie" />
                     </div>
                 </v-card>
             </v-col>
@@ -57,7 +57,6 @@ export default {
             selectId: -1,
             movie: '',
             movies: [],
-            apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
             user: this.$store.getters.user,
             multiLine: true,
             snackbar: false,
@@ -73,7 +72,7 @@ export default {
     methods: {
         getMovies() {
             // &language=ja
-            axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${this.apiKey}`)
+            axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${this.$store.state.apiKey}`)
             .then(response => {
                 this.movies = response.data.results
                 this.$store.commit('ready', true)
@@ -138,4 +137,9 @@ export default {
 .red {
   background-color: red;
 }
+</style>
+<style>
+    .v-application a{
+        text-decoration: none;
+    }
 </style>

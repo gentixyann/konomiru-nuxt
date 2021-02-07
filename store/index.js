@@ -9,7 +9,8 @@ export const state = () => ({
         text: null,
         likedMovies: [],
     },
-    ready: false
+    ready: false,
+    apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
 })
 export const getters = {
     user: state => {

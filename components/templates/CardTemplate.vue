@@ -9,17 +9,6 @@
 <script>
 export default {
     props: ['title', 'release_date', 'overview'],
-    // 型付けする場合
-    // props: [{
-    //     title: {
-    //         type: String
-    //     },
-    //     release_date: {
-    //         type: Number
-    //     },
-    //     overview: {
-    //         type: String
-    //     }
-    // }],
+
 }
 </script>

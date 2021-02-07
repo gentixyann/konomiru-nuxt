@@ -291,112 +291,118 @@ export default {
         },
         valid: false,
         registrationErrors: {},
-      dialog: false,
-      email: '',
-      password: '',
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
-        {
-          icon: 'mdi-home',
-          title: 'Home',
-          to: '/'
-        },
-        // {
-        //   icon: 'mdi-chart-bubble',
-        //   title: 'Inspire',
-        //   to: '/inspire'
-        // },
-        {
-          icon: 'mdi-account',
-          title: 'Mypage',
-          to: '/mypage'
-        },
-        {
-          icon: 'mdi-magnify',
-          title: 'Search',
-          to: '/search'
-        },
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Konomiru'
-    }
-  },
-       computed: {
-            currentTitle () {
-                switch (this.step) {
-                case 1: return 'ログイン'
-                case 2: return '会員登録'
-                default: return 'パスワード再設定'
-                }
+        dialog: false,
+        email: '',
+        password: '',
+        clipped: false,
+        drawer: false,
+        fixed: false,
+        items: [
+            {
+                icon: 'mdi-home',
+                title: 'Home',
+                to: '/'
             },
-            auth(){
-              return this.$store.getters.user.uid ? true : false
-            }
-        },
-        methods: {
-            loginGoogle(){
-                this.$store.dispatch('loginGoogle');
-                this.dialog = false;
+            {
+                icon: 'mdi-account',
+                title: 'Mypage',
+                to: { name: 'mypage-id', params: { id: this.mypageId } }
             },
-            login() {
-                this.$store.dispatch('login', {email: this.email, password: this.password})
-                this.dialog = false;
+            {
+                icon: 'mdi-magnify',
+                title: 'Search',
+                to: '/search'
             },
-            blurInput() {
-              var registrationArray = Object.values(this.registration).map(registration => {
-                return registration;
-              })
-              this.initial = registrationArray.some((registration) => {
-                return registration === '';
-              })
-            },
-            register() {
-                var url = '/register';
-                var params = {
-                    name: this.registration.name,
-                    screen_name: this.registration.screen_name,
-                    email: this.registration.email,
-                    password: this.registration.password,
-                    password_confirmation: this.registration.confirmationPassword,
-                    profile_image: this.avatar
-                };
-                this.$store.dispatch('register', params)
-            },
-            logout(){
-              firebase.auth().signOut().then(() => {
-                this.$store.dispatch('logout')
-              }).catch((error) => {
-                // An error happened.
-              });
-            },
-            sendPasswordResetLink(){
-              this.progress = true;
-                var url = '/password/email';
-                var params = {
-                  email: this.resetEmail,
-                };
-                axios.post(url, params)
-                .then((response) => {
-                  this.progress = false,
-                  this.step = 1,
-                  this.emailSnackbar = true
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    let that = this;
-                    var responseErrors = error.response.data.errors;
-                    console.log(error.response.data.errors)
-                    var errors = {};
-                    for(var key in responseErrors) {
-                        errors[key] = responseErrors[key][0];
-                    }
-                    that.resetErrors = errors;
-                });
-            }
+        ],
+        miniVariant: false,
+        right: true,
+        rightDrawer: false,
+        title: 'Konomiru'
         }
+    },
+    computed: {
+        currentTitle () {
+            switch (this.step) {
+            case 1: return 'ログイン'
+            case 2: return '会員登録'
+            default: return 'パスワード再設定'
+            }
+        },
+        auth(){
+            return this.$store.getters.user.uid ? true : false
+        },
+        mypageId(){
+            return this.$store.getters.user.uid
+        }
+    },
+    watch: {
+        mypageId:{
+            handler(){
+                this.items[1] = {icon: 'mdi-account', title: 'Mypage', to: { name: 'profile-uid', params: { uid: this.mypageId } } }
+            },
+            immediate: true
+        }
+    },
+    methods: {
+        loginGoogle(){
+            this.$store.dispatch('loginGoogle');
+            this.dialog = false;
+        },
+        login() {
+            this.$store.dispatch('login', {email: this.email, password: this.password})
+            this.dialog = false;
+        },
+        blurInput() {
+            var registrationArray = Object.values(this.registration).map(registration => {
+            return registration;
+            })
+            this.initial = registrationArray.some((registration) => {
+            return registration === '';
+            })
+        },
+        register() {
+            var url = '/register';
+            var params = {
+                name: this.registration.name,
+                screen_name: this.registration.screen_name,
+                email: this.registration.email,
+                password: this.registration.password,
+                password_confirmation: this.registration.confirmationPassword,
+                profile_image: this.avatar
+            };
+            this.$store.dispatch('register', params)
+        },
+        logout(){
+            firebase.auth().signOut().then(() => {
+            this.$store.dispatch('logout')
+            }).catch((error) => {
+            // An error happened.
+            });
+        },
+        sendPasswordResetLink(){
+            this.progress = true;
+            var url = '/password/email';
+            var params = {
+                email: this.resetEmail,
+            };
+            axios.post(url, params)
+            .then((response) => {
+                this.progress = false,
+                this.step = 1,
+                this.emailSnackbar = true
+            })
+            .catch((error) => {
+                this.progress = false;
+                let that = this;
+                var responseErrors = error.response.data.errors;
+                console.log(error.response.data.errors)
+                var errors = {};
+                for(var key in responseErrors) {
+                    errors[key] = responseErrors[key][0];
+                }
+                that.resetErrors = errors;
+            });
+        }
+    }
 }
 </script>

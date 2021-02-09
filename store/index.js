@@ -1,5 +1,6 @@
-
 import firebase from '~/plugins/firebase'
+
+
 export const state = () => ({
     user: {
         uid: null,
@@ -12,7 +13,6 @@ export const state = () => ({
     ready: false,
     apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
     windowSize: {x: 0, y: 0},
-    introduction: true,
 })
 export const getters = {
     user: state => {
@@ -45,10 +45,6 @@ export const mutations = {
     windowSize(state,size){
         state.windowSize = size;
     },
-    introduction(state,payload){
-        state.introduction = payload;
-        console.log(payload)
-    }
 }
 export const actions = {
     login({ dispatch, commit }, payload) {
@@ -81,7 +77,7 @@ export const actions = {
             const db = firebase.firestore();
             await db.collection('users').doc(newUser.uid).set({ name: payload.name, email: payload.email, photoURL: null, text: null})
                 commit('getData', { uid: newUser.uid, name: payload.name, email: payload.name, photoURL: null, text: null })
-                commit('introduction', false)
+                $nuxt.$router.push('/introduction')
         } catch (error) {
             console.log('error')
         }
@@ -115,6 +111,7 @@ export const actions = {
             const db = firebase.firestore();
             if(db.collection(`users`).doc(result.user.uid).get()){//過去にログインがある場合
                 try {
+                    let that = this;
                     db.collection(`users`).doc(result.user.uid).get().then(query => {
                         commit('getData', { uid: result.user.uid, name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, text: query.data().text })
                         dispatch('getLikedMovies', result.user.uid)
@@ -124,7 +121,7 @@ export const actions = {
                 }
             } else {//初めてのログインの場合
                 db.collection('users').doc(result.user.uid).set({ name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL})
-                commit('introduction', false)
+                $nuxt.$router.push('/introduction')
             }
         }).catch(function (error) {
             console.log(error)

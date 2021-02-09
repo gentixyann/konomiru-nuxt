@@ -67,9 +67,19 @@ export default {
             if(this.page == -1){
                 this.page = this.items.length - 1;
             } else if(this.page == this.items.length){
-                this.$store.commit('introduction', true)
+                this.$router.push('/')
             }
         }
     },
 }
 </script>
+<style scoped>
+    .fade-enter-active, .fade-leave-active {
+      transition: all 2.5s;
+
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+      opacity: 0;
+      transform: translateX(300px);
+    }
+</style>

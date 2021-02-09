@@ -9,7 +9,7 @@
                 </v-list-item-avatar>
                 <v-list-item-content class="px-4" style="max-width: 600px;margin: auto">
                     <v-list-item-title class="mb-2 text-center" style="font-size: 24px;">{{ user.name }}</v-list-item-title>
-                    <v-textarea outlined label="自己紹介" rows="2" row-height="10" v-model="text" @blur="saveText" style="font-size: 16px"></v-textarea>
+                    <v-textarea outlined label="自己紹介" rows="2" row-height="10" v-model="introduction" @blur="saveText" style="font-size: 16px"></v-textarea>
                 </v-list-item-content>
             </v-list-item>
         </v-list>
@@ -24,14 +24,14 @@ import firebase from '~/plugins/firebase'
 export type DataType = {
     visitor: any,
     windowSize: { x: number, y: number},
-    text: string|null
+    introduction: string|null
 }
 export default Vue.extend({
     data(): DataType{
         return {
             visitor: '',
             windowSize: this.$store.getters.windowSize,
-            text: null,
+            introduction: null,
         }
     },
     computed: {
@@ -48,7 +48,7 @@ export default Vue.extend({
     watch: {
         userText:{
             handler(){
-                this.text = this.userText
+                this.introduction = this.userText
             },
             immediate: true
         }
@@ -56,7 +56,7 @@ export default Vue.extend({
     methods: {
         saveText(){
             const db = firebase.firestore();
-            db.collection('users').doc(this.user.uid).update({ text: this.text})
+            db.collection('users').doc(this.user.uid).update({ text: this.introduction})
         },
         btnclick2(): void {
             if(this.visitor.id == this.user.id){

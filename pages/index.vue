@@ -3,7 +3,7 @@
     <v-container>
         <v-row class="text-center">
             <v-col cols="12">
-                みんなの好きな作品
+                みんなの好きな作品<v-btn @click="$router.push('/introduction')">紹介</v-btn>
             </v-col>
         </v-row>
         <v-row v-if="ready">

@@ -14,7 +14,7 @@
                     <div class="list-item" style="justify-content: center;align-items: center;" v-for="(point, i) in points" :key="i">
                         <div class="d-flex py-4 px-4" style="justify-content: start;align-items: center;">
                             <div class="d-flex text-center mx-2" style="justify-content: center;align-items: center;border-radius: 50%;color: #34a0ad;border: 1px solid #34a0ad;min-width: 55px;min-height: 55px;"><span>要点<br>{{ i+1 }}</span></div>
-                            <textarea @focus="focus=true" @blur="saveText(i)" ref="point" :rows="str(point.text)" v-model="point.text" style="font-size: 16px;width: 100%" maxlength="144" row-height="5"></textarea>
+                            <textarea @keyup.exact.enter="blur(i)" @focus="focus=true" @blur="saveText(i)" ref="point" :rows="str(point.text)" v-model="point.text" style="font-size: 16px;width: 100%" maxlength="144" row-height="5"></textarea>
                         </div>
                         <v-divider v-if="i<2" />
                     </div>
@@ -91,7 +91,6 @@ export default {
                     docId.push(doc.id)
                 })
             })
-                
             try {
                 if(this.points[index].text == ''){
                     db.collection(`users/${uid}/movies/${this.$route.params.mid}/points`).doc(docId[index]).delete()
@@ -114,15 +113,18 @@ export default {
         str(text){
             if (text) {
                 if (text.length <=48) {
-                    return 1
+                    return 2
                 } else if(text.length <=96){
                     return 2
                 } else {
                     return 3;
                 }
             } else {
-                return 1
+                return 2
             }
+        },
+        blur(index){
+            this.$refs.point[index].blur();
         }
     }
 }

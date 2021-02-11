@@ -57,6 +57,7 @@ export default Vue.extend({
         saveText(){
             const db = firebase.firestore();
             db.collection('users').doc(this.user.uid).update({ text: this.introduction})
+            this.$store.dispatch('loadUser')
         },
         btnclick2(): void {
             if(this.visitor.id == this.user.id){

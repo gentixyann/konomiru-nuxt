@@ -99,7 +99,8 @@ export const actions = {
             if (user) {
                 const db = firebase.firestore();
                 db.collection(`users`).doc(user.uid).get().then(query => {
-                    commit('getData', { uid: user.uid, name: user.displayName, email: user.email, photoURL: user.photoURL, text: query.data().text })
+                    let text = query.exists ? query.data().text : '';
+                    commit('getData', { uid: user.uid, name: user.displayName, email: user.email, photoURL: user.photoURL, text: text })
                     dispatch('getLikedMovies', user.uid)
                 })
             }
@@ -109,20 +110,21 @@ export const actions = {
         var provider = new firebase.auth.GoogleAuthProvider()
         firebase.auth().signInWithPopup(provider).then(function (result) {
             const db = firebase.firestore();
-            if(db.collection(`users`).doc(result.user.uid).get()){//過去にログインがある場合
+            //過去にログインがある場合
                 try {
-                    let that = this;
                     db.collection(`users`).doc(result.user.uid).get().then(query => {
-                        commit('getData', { uid: result.user.uid, name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, text: query.data().text })
-                        dispatch('getLikedMovies', result.user.uid)
+                        if (query.exists) {
+                            let text = query.exists ? query.data().text : '';
+                            commit('getData', { uid: result.user.uid, name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, text: text })
+                            dispatch('getLikedMovies', result.user.uid)
+                        } else {
+                            db.collection('users').doc(result.user.uid).set({ name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, text: null})
+                            $nuxt.$router.push('/introduction')
+                        }
                     })
                 } catch (error) {
                     dispatch('logout')
                 }
-            } else {//初めてのログインの場合
-                db.collection('users').doc(result.user.uid).set({ name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL})
-                $nuxt.$router.push('/introduction')
-            }
         }).catch(function (error) {
             console.log(error)
         })

@@ -14,13 +14,13 @@
                     <div class="list-item" style="justify-content: center;align-items: center;" v-for="(point, i) in points" :key="i">
                         <div class="d-flex py-4 px-4" style="justify-content: start;align-items: center;">
                             <div class="d-flex text-center mx-2" style="justify-content: center;align-items: center;border-radius: 50%;color: #34a0ad;border: 1px solid #34a0ad;min-width: 55px;min-height: 55px;"><span>要点<br>{{ i+1 }}</span></div>
-                            <textarea @keyup.exact.enter="blur(i)" @focus="focus=true" @blur="saveText(i)" ref="point" :rows="str(point.text)" v-model="point.text" style="font-size: 16px;width: 100%" maxlength="144" row-height="5"></textarea>
+                            <textarea class="resize" :style="'height:'+height[i]" @focus="focus(i)" @blur="saveText(i)" ref="point" :rows="str(point.text)" v-model="point.text" style="font-size: 16px;width: 100%" maxlength="144" ></textarea>
                         </div>
                         <v-divider v-if="i<2" />
                     </div>
                 </transition-group>
                 <div class="d-flex py-4 px-2" style="justify-content: center;align-items: center;" v-if="points.length<3">
-                    <v-btn class="primary" fab @click="newPoint" :disabled="focus"><v-icon>mdi-plus</v-icon></v-btn>
+                    <v-btn class="primary" fab @click="newPoint" :disabled="isFocus"><v-icon>mdi-plus</v-icon></v-btn>
                 </div>
             </div>
             <div v-else>
@@ -43,7 +43,9 @@ export default {
         return {
             points: [],
             movie: {},
-            focus: false,
+            isFocus: false,
+            height: ['60px', '60px','60px'],
+            elementIndex: '',
         }
     },
     computed: {
@@ -52,6 +54,14 @@ export default {
         },
         windowSize(){
             return this.$store.getters.windowSize;
+        },
+    },
+    watch:{
+        points: {
+            handler(val){
+                this.resize(this.elementIndex);
+            },
+            deep: true,
         }
     },
     created(){
@@ -71,13 +81,29 @@ export default {
             .then(response => {
                 Object.assign(this.movie,response.data);
                 this.$store.commit('ready',true)
-                console.log(this.movie)
             })
         })
     },
+    mounted(){
+        this.resize(this.elementIndex);
+    },
     methods: {
+        focus(index){
+            this.isFocus=true;
+            this.elementIndex = index;
+        },
+        resize(index){
+            if (this.$refs.point) {
+                this.height[index] = "auto";
+                if (index!=='') {
+                    this.$nextTick(()=>{
+                        this.$refs.point[index] ? this.height.splice(index, 1, this.$refs.point[index].scrollHeight + 'px') + 'px' : false;
+                    })
+                }
+            }
+        },
         async newPoint(){
-            this.focus = true;
+            this.isFocus = true;
             await this.points.push({text: ''});
             this.$refs.point[this.points.length-1].focus()
         },
@@ -91,8 +117,8 @@ export default {
                     docId.push(doc.id)
                 })
             })
-            try {
-                if(this.points[index].text == ''){
+            if (this.points.length<=3) {
+                if(this.points[index].text.replace(/\r?\n/g,'') == ''){
                     db.collection(`users/${uid}/movies/${this.$route.params.mid}/points`).doc(docId[index]).delete()
                     .then(() => {
                         this.points.splice(index, 1)
@@ -105,10 +131,8 @@ export default {
                         db.collection(`users/${uid}/movies/${this.$route.params.mid}/points`).add(this.points[index])
                     }
                 }
-            } catch (error) {
-                
             }
-            this.focus = false;
+            this.isFocus = false;
         },
         str(text){
             if (text) {
@@ -131,7 +155,7 @@ export default {
 </script>
 <style>
 .list-item {
-    transition: all 1s;
+    transition: all 0.5s;
     height: auto
 }
 .list-enter-active, .list-leave-active {
@@ -144,7 +168,9 @@ export default {
 .list-leave-to /* .list-leave-active for below version 2.1.8 */ {
     opacity: 0;
     transform: translate(-30px);
-    position: absolute;
+    /* position: absolute; */
 }
-
+.resize {
+    resize: none;
+}
 </style>

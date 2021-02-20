@@ -49,6 +49,7 @@
 
 <script>
 import axios from 'axios'
+import firebase from '@/plugins/firebase.js'
 export default {
     name: 'search',
     data() {
@@ -64,6 +65,11 @@ export default {
             apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
 
         }
+    },
+    computed: {
+        user(){
+            return this.$store.getters.user;
+        },
     },
     methods: {
         getSearch(query) {

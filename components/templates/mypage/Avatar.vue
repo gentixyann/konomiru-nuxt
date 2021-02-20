@@ -8,12 +8,15 @@
                     </v-avatar>
                 </v-list-item-avatar>
                 <v-list-item-content class="px-4" style="max-width: 600px;margin: auto">
-                    <v-list-item-title class="mb-2 text-center" style="font-size: 24px;">{{ user.name }}</v-list-item-title>
-                    <v-textarea outlined label="自己紹介" rows="2" row-height="10" v-model="introduction" @blur="saveText" style="font-size: 16px"></v-textarea>
+                    <v-list-item-title class="mb-4" style="font-size: 24px;position:relative;overflow:visible"><input v-model="userName"><v-btn style="position: absolute;right:0" @click="saveText">保存</v-btn></v-list-item-title>
+                    <v-textarea outlined label="自己紹介" rows="2" row-height="10" v-model="introduction" style="font-size: 16px"></v-textarea>
                 </v-list-item-content>
             </v-list-item>
         </v-list>
         <input style="display: none" ref="avatar" type="file" accept="image/jpeg, image/jpg, image/png" @input="changeAvatar">
+    <v-snackbar v-model="snackbar" :timeout="timeout">
+      保存されました。
+    </v-snackbar>
     </div>
 </template>
 
@@ -24,7 +27,10 @@ import firebase from '~/plugins/firebase'
 export type DataType = {
     visitor: any,
     windowSize: { x: number, y: number},
-    introduction: string|null
+    introduction: string|null,
+    snackbar: boolean,
+    timeout: number,
+    userName: string
 }
 export default Vue.extend({
     data(): DataType{
@@ -32,12 +38,12 @@ export default Vue.extend({
             visitor: '',
             windowSize: this.$store.getters.windowSize,
             introduction: null,
+            snackbar: false,
+            timeout: 2000,
+            userName: '',
         }
     },
     computed: {
-        requestedUserInfo(): object{
-            return this.user;
-        },
         user(){
             return this.$store.getters.user;
         },
@@ -51,13 +57,23 @@ export default Vue.extend({
                 this.introduction = this.userText
             },
             immediate: true
+        },
+        user:{
+            handler(){
+                this.userName = this.$store.getters.user.name
+            },
+            immediate: true,
+            deep: true,
         }
     },
     methods: {
         saveText(){
             const db = firebase.firestore();
-            db.collection('users').doc(this.user.uid).update({ text: this.introduction})
-            this.$store.dispatch('loadUser')
+            db.collection('users').doc(this.user.uid).update({name: this.userName, text: this.introduction})
+            this.snackbar = true;
+            const updatedUserInfo = Object.assign(this.user,{name: this.userName, text: this.introduction})
+            this.$store.commit('getData', updatedUserInfo)
+
         },
         btnclick2(): void {
             if(this.visitor.id == this.user.id){

@@ -11,6 +11,7 @@ import axios from "axios";
 import firebase from '@/plugins/firebase.js'
 import HeaderComponent from "../components/templates/Header";
 export default {
+  name: 'login',
   components: {
     HeaderComponent,
   },

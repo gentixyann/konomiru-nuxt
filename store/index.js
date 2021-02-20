@@ -13,6 +13,7 @@ export const state = () => ({
     ready: false,
     apiKey: 'a1a357b8cd4732e4d9c84ecc9a1d7406',
     windowSize: {x: 0, y: 0},
+    isLogin: '',
 })
 export const getters = {
     user: state => {
@@ -45,6 +46,9 @@ export const mutations = {
     windowSize(state,size){
         state.windowSize = size;
     },
+    isLogin(state,payload){
+        state.isLogin = payload
+    }
 }
 export const actions = {
     login({ dispatch, commit }, payload) {
@@ -55,6 +59,8 @@ export const actions = {
                 commit('getData', { uid: user.uid,name: user.displayName, email: user.email, photoURL: user.photoURL, text: user.text })
                 dispatch('getLikedMovies', user.uid)
             }
+            $nuxt.$router.push('/')
+            commit('isLogin',true)
         })
 
         }).catch((error) => {
@@ -64,6 +70,7 @@ export const actions = {
     logout({ commit }) {
         commit('getData', { uid: null, name: null, email: null, photoURL: null, text: null });
         commit('likedMovies', [])
+        commit('isLogin',false)
     },
     async register({ commit, dispatch }, payload) {
         try {
@@ -100,7 +107,7 @@ export const actions = {
                 const db = firebase.firestore();
                 db.collection(`users`).doc(user.uid).get().then(query => {
                     let text = query.exists ? query.data().text : '';
-                    commit('getData', { uid: user.uid, name: user.displayName, email: user.email, photoURL: user.photoURL, text: text })
+                    commit('getData', { uid: user.uid, name: query.data().name, email: user.email, photoURL: user.photoURL, text: text })
                     dispatch('getLikedMovies', user.uid)
                 })
             }
@@ -115,8 +122,10 @@ export const actions = {
                     db.collection(`users`).doc(result.user.uid).get().then(query => {
                         if (query.exists) {
                             let text = query.exists ? query.data().text : '';
-                            commit('getData', { uid: result.user.uid, name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, text: text })
+                            commit('getData', { uid: result.user.uid, name: query.data().name, email: result.user.email, photoURL: result.user.photoURL, text: text })
                             dispatch('getLikedMovies', result.user.uid)
+                            $nuxt.$router.push('/')
+                            commit('isLogin',true)
                         } else {
                             db.collection('users').doc(result.user.uid).set({ name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL, text: null})
                             $nuxt.$router.push('/introduction')

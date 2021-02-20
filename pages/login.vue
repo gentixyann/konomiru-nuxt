@@ -168,6 +168,14 @@
                 </v-btn>
             </template>
         </v-snackbar>
+        <v-snackbar v-model="loginSnackbar" :timeout="timeout">
+            ログインしました
+            <template v-slot:action="{ attrs }">
+                <v-btn color="blue" text v-bind="attrs" @click="loginSnackbar = false">
+                閉じる
+                </v-btn>
+            </template>
+        </v-snackbar>
     </div>
 </template>
 
@@ -178,6 +186,7 @@ export default {
     layout: 'login',
   data () {
     return {
+        loginSnackbar: false,
       resetErrors: {},
       emailSnackbar: false,
       timeout: 2000,

@@ -4,7 +4,7 @@
         <v-row v-if="ready">
             <v-col v-for="(movie, i) in movies" :key="i">
                 <router-link :to="{ name: 'profile-uid-mid', params: { uid: $route.params.uid, mid: likedMovies[i].mid } }">
-                    <v-card class="d-flex" style="position:relative;z-index: 1;" width="330"><!--qiita-->
+                    <v-card class="d-flex" style="position:relative;z-index: 1;" width="330">
                         <div>
                             <v-img v-bind:src="'http://image.tmdb.org/t/p/w154/' + movie.poster_path"></v-img>
                         </div>
@@ -42,14 +42,15 @@ export default {
     },
     computed: {
         likedMovies(){
-            return this.$store.getters.likedMovies;
+            const likedMovies = this.$store.getters.likedMovies;
+            return likedMovies ? likedMovies : false;
         },
         ready(){
             return this.$store.state.ready;
         }
     },
     mounted(){
-        console.log(this.movies)
+        // console.log(this.movies)
     },
     watch:{
         likedMovies(){

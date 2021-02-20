@@ -60,7 +60,7 @@
             <v-btn @click="logout">ログアウト</v-btn>
         </div>
         <div v-else>
-            <v-btn @click="dialog =true">ログイン/新規登録</v-btn>
+            <v-btn to="/login">ログイン/新規登録</v-btn>
         </div>
         </v-app-bar>
         <v-navigation-drawer
@@ -80,7 +80,7 @@
                 </v-list-item>
             </v-list>
             </v-navigation-drawer>
-        <v-row justify="center">
+        <!-- <v-row justify="center">
             <v-dialog
             v-model="dialog"
             max-width="600px"
@@ -111,7 +111,6 @@
                         </v-window-item>
                         <v-window-item :value="1">
                         <v-form ref="form" lazy-validation>
-                        <!-- <h4 class="py-2">ログイン</h4> -->
                         <v-text-field class="py-2" v-model="email" placeholder="アドレス" label="Email" required clearable @keyup.enter.exact="login"></v-text-field>
                         <v-text-field autofocus v-model="password" placeholder="パスワード" :counter="10" label="Password" required @click:append="show1 = !show1" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'" @keyup.enter.exact="login"></v-text-field>
                         <div v-if="Object.keys(errors).length !== 0">
@@ -241,7 +240,7 @@
                 </v-snackbar>
             </div>
             </v-dialog>
-        </v-row>
+        </v-row> -->
         <v-footer :absolute="!fixed" app>
             <span>&copy; {{ new Date().getFullYear() }}</span>
         </v-footer>
